@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/task
+    username: task-app
+    platform: postgresql
+    initialization-mode: never
+    hikari:
+      auto-commit: false
+  liquibase:
+    enabled: true
+    user: admin
+    password: admin
+
+logging.level:
+  com.zaxxer.hikari: WARN
+  org.springframework: WARN
