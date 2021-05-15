@@ -10,8 +10,8 @@ plugins {
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.springframework.boot") version "2.4.5" apply false
 
-    kotlin("jvm") version "1.4.32" apply false
-    kotlin("plugin.spring") version "1.4.32" apply false
+    kotlin("jvm") version "1.5.0" apply false
+    kotlin("plugin.spring") version "1.5.0" apply false
 }
 
 allprojects {
@@ -48,7 +48,10 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:${property("springBootVersion")}")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:${property("springBootVersion")}") {
+                bomProperty("kotlin.version", "1.5.0")
+                bomProperty("kotlinVersion", "1.5.0")
+            }
             mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
         }
     }

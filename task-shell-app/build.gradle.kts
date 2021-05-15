@@ -9,7 +9,6 @@ dependencies {
     implementation(project(":adapters:task-persistence"))
     implementation(project(":task-domain"))
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.liquibase:liquibase-core")
     implementation("org.springframework.shell:spring-shell-starter:2.0.0.RELEASE")
 
