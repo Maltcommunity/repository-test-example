@@ -12,6 +12,7 @@ dependencies {
     implementation("org.postgresql:postgresql")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 
+    testImplementation(project(path = ":task-domain", configuration = "testJar"))
     testImplementation(project(":common:test-utils"))
 }
 
