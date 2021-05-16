@@ -18,4 +18,6 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-test")
     api("org.testcontainers:junit-jupiter")
     api("org.testcontainers:postgresql")
+
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 }
