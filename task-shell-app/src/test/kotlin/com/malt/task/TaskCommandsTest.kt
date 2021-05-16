@@ -16,7 +16,7 @@ internal class TaskCommandsTest {
 
     val clock = SettableClock()
     val repository = InMemoryTaskRepository()
-    val sut = TaskCommands(clock, repository)
+    val sut = TaskCommands(CurrentUserTaskService(clock, repository))
 
     @BeforeEach
     fun defineCurrentUser() {

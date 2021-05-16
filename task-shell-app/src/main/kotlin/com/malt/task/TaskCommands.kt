@@ -1,19 +1,16 @@
 package com.malt.task
 
-import com.malt.task.CurrentTaskOwnerIdHolder.currentTaskOwnerId
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
 import org.springframework.transaction.annotation.Transactional
-import java.time.Clock
 import java.util.stream.Collectors.joining
 
 private val NL = System.lineSeparator()
 
 @ShellComponent
 class TaskCommands(
-        private val clock: Clock,
-        private val taskRepository: TaskRepository
+        private val taskService: CurrentUserTaskService
 ) {
 
     @Transactional
@@ -22,13 +19,7 @@ class TaskCommands(
             summary: String,
             description: String
     ): String {
-        val newTask = Task(
-                clock = clock,
-                ownerId = currentTaskOwnerId,
-                summary = summary,
-                description = description
-        )
-        taskRepository.save(newTask)
+        val newTask = taskService.addTaskForUser(summary, description)
 
         return """
             Task ${newTask.id.value} created with:
@@ -43,7 +34,7 @@ class TaskCommands(
             @ShellOption(value = ["oneline"], help = "Display each task on a single line")
             oneLinePerTask: Boolean
     ): String? {
-        return taskRepository.find(TaskOwnerIdIs(currentTaskOwnerId))
+        return taskService.findAllUserTasks()
                 .map { it.multilineRepresentation(oneLinePerTask) }
                 .collect(joining(NL + NL))
                 .ifEmpty { "Nothing to do right now!" }
