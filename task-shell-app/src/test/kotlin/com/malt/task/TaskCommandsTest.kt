@@ -1,29 +1,18 @@
 package com.malt.task
 
-import com.malt.task.test.InMemoryTaskRepository
-import com.malt.test.time.SettableClock
-import org.junit.jupiter.api.BeforeEach
+import com.malt.task.TaskCommandsFixtures.Companion.ownerIdOfCurrentUser
+import com.malt.task.test.TaskBuilder
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
-import strikt.assertions.hasSize
 import strikt.assertions.isEqualTo
 import kotlin.streams.toList
 
-private val ownerIdOfCurrentUser = TaskOwnerId("some-owner-id")
-
 internal class TaskCommandsTest {
 
-    val clock = SettableClock()
-    val repository = InMemoryTaskRepository()
-    val sut = TaskCommands(CurrentUserTaskService(clock, repository))
-
-    @BeforeEach
-    fun defineCurrentUser() {
-        if (!CurrentTaskOwnerIdHolder.isDefined) {
-            CurrentTaskOwnerIdHolder.define(ownerIdOfCurrentUser)
-        }
-    }
+    val fixtures = TaskCommandsFixtures()
+    val repository = fixtures.repository
+    val sut = TaskCommands(fixtures.currentUserTaskService)
 
     @Nested
     inner class AddTaskCommand {
@@ -33,22 +22,12 @@ internal class TaskCommandsTest {
             // given
             val taskSummary = "Some task"
             val taskDescription = "the aim of it being to do something"
-            val expectedCreationDate = clock.stop().offsetDateTime
 
             // when
             val resultingDisplay = sut.addTask(summary = taskSummary, description = taskDescription)
 
             // then
-            val userTasks = repository.find(TaskOwnerIdIs(ownerIdOfCurrentUser)).toList()
-            expectThat(userTasks) hasSize 1
-
-            val createdTask = userTasks[0]
-            expectThat(createdTask) {
-                get { ownerId } isEqualTo ownerIdOfCurrentUser
-                get { creationDate } isEqualTo expectedCreationDate
-                get { summary } isEqualTo taskSummary
-                get { description } isEqualTo taskDescription
-            }
+            val createdTask = findFirstTaskOfUser()
 
             expectThat(resultingDisplay) isEqualTo """
                 Task ${createdTask.id.value} created with:
@@ -56,6 +35,9 @@ internal class TaskCommandsTest {
                 Description: $taskDescription
             """.trimIndent()
         }
+
+        private fun findFirstTaskOfUser() =
+                repository.find(TaskOwnerIdIs(ownerIdOfCurrentUser)).toList().first()
     }
 
     @Nested
@@ -76,11 +58,9 @@ internal class TaskCommandsTest {
         @Test
         fun `should display a representation of each task owned by current user`() {
             // given
-            givenExistingTask(1, ownerIdOfCurrentUser)
-            givenExistingTask(2, TaskOwnerId("some-other-owner"))
-            givenExistingTask(3, ownerIdOfCurrentUser)
-            givenExistingTask(4, ownerIdOfCurrentUser)
-            givenExistingTask(5, TaskOwnerId("yet-another-owner"))
+            givenExistingTaskOfCurrentUser(1)
+            givenExistingTaskOfCurrentUser(2)
+            givenExistingTaskOfCurrentUser(3)
 
             // when
             val resultingDisplay = sut.listTasks(oneLinePerTask = false)
@@ -91,22 +71,24 @@ internal class TaskCommandsTest {
                 summary of task 1
                 description of task 1
                 
+                task-id-2
+                summary of task 2
+                description of task 2
+                
                 task-id-3
                 summary of task 3
                 description of task 3
-                
-                task-id-4
-                summary of task 4
-                description of task 4
             """.trimIndent()
         }
 
-        private fun givenExistingTask(id: Int, ownerId: TaskOwnerId) {
-            repository.save(Task(
+        private fun givenExistingTaskOfCurrentUser(id: Int) {
+            val task = TaskBuilder(
                     id = TaskId("task-id-$id"),
-                    ownerId = ownerId,
+                    ownerId = ownerIdOfCurrentUser,
                     summary = "summary of task $id",
-                    description = "description of task $id"))
+                    description = "description of task $id"
+            ).build()
+            repository.save(task)
         }
     }
 }
