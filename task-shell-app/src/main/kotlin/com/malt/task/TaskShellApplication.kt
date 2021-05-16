@@ -8,7 +8,7 @@ class TaskShellApplication
 
 fun main(args: Array<String>) {
     val taskOwnerId = determineTaskOwnerId(args)
-    TaskOwnerIdHolder.taskOwnerId = taskOwnerId
+    CurrentTaskOwnerIdHolder.define(taskOwnerId)
 
     println("Please wait a bit, your task manager is loading...")
     println()

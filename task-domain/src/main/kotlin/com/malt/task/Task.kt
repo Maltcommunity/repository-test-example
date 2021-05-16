@@ -1,5 +1,6 @@
 package com.malt.task
 
+import java.time.Clock
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -37,6 +38,20 @@ class Task(
         val summary: String,
         val description: String
 ) {
+
+    constructor(
+            id: TaskId = TaskId.generate(),
+            clock: Clock,
+            ownerId: TaskOwnerId,
+            summary: String,
+            description: String
+    ) : this(
+            id = id,
+            creationDate = OffsetDateTime.now(clock),
+            ownerId = ownerId,
+            summary = summary,
+            description = description
+    )
 
     fun withSummary(newSummary: String) = copy(summary = newSummary)
 

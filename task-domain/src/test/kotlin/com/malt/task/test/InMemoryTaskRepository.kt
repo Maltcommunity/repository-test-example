@@ -19,4 +19,8 @@ class InMemoryTaskRepository : TaskRepository {
 
     override fun find(specification: TaskSpecification): Stream<Task> =
             tasks.stream().filter { specification.isSatisfiedBy(it) }
+
+    fun clear() {
+        tasks.clear()
+    }
 }
