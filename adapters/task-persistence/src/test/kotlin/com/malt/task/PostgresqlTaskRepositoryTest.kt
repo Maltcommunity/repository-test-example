@@ -9,13 +9,10 @@ import javax.inject.Inject
 @JdbcTemplatePostgresqlTest
 @Import(PostgresqlTaskRepository::class)
 @Sql("/task-schema.sql")
-internal class PostgresqlTaskRepositoryTest {
+internal class PostgresqlTaskRepositoryTest : TaskRepositoryContract() {
 
     @Inject
     lateinit var sut: PostgresqlTaskRepository
 
-    @Test
-    fun `should perform some test`() {
-        println("sut has been injected: $sut")
-    }
+    override fun buildRepositoryUnderTest() = sut
 }

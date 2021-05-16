@@ -21,6 +21,7 @@ infix fun <T> Assertion.Builder<T>.isEqualToComparingProperties(expected: T?): A
                 actual == expected -> pass(actual = actual)
                 expected == null -> fail(actual = actual)
                 else -> {
+                    @Suppress("UNCHECKED_CAST")
                     val firstPropNotEqual = actual!!::class.memberProperties
                             .filter { it.visibility == KVisibility.PUBLIC }
                             .map { it as KProperty1<T, *> }

@@ -1,3 +1,6 @@
+--liquibase formatted sql
+--changeset dev-team:task-00002-create-task-table logicalFilePath:fixed
+
 CREATE SCHEMA IF NOT EXISTS task;
 
 CREATE TABLE IF NOT EXISTS task.tasks
