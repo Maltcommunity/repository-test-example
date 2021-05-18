@@ -11,7 +11,7 @@ class InMemoryTaskRepository : TaskRepository {
     private val tasks = mutableListOf<Task>()
 
     override fun save(task: Task) {
-        tasks.removeIf { it.id == task.id }
+        delete(task.id)
         tasks.add(task)
     }
 
@@ -19,6 +19,10 @@ class InMemoryTaskRepository : TaskRepository {
 
     override fun find(specification: TaskSpecification): Stream<Task> =
             tasks.stream().filter { specification.isSatisfiedBy(it) }
+
+    override fun delete(taskId: TaskId) {
+        tasks.removeIf { it.id == taskId }
+    }
 
     fun clear() {
         tasks.clear()

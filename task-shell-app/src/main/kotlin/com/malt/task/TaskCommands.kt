@@ -3,8 +3,6 @@ package com.malt.task
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
-import org.springframework.transaction.annotation.Transactional
-import java.util.stream.Collectors.joining
 
 private val NL = System.lineSeparator()
 
@@ -13,7 +11,6 @@ class TaskCommands(
         private val taskService: CurrentUserTaskService
 ) {
 
-    @Transactional
     @ShellMethod(key = ["add-task"], value = "Add a new task")
     fun addTask(
             summary: String,
@@ -32,7 +29,6 @@ class TaskCommands(
         """.trimIndent()
     }
 
-    @Transactional(readOnly = true)
     @ShellMethod(key = ["list-tasks"], value = "List tasks")
     fun listTasks(
             @ShellOption(value = ["oneline"], help = "Display each task on a single line")
@@ -40,18 +36,40 @@ class TaskCommands(
     ): String? {
         return taskService.findAllUserTasks()
                 .map { it.multilineRepresentation(oneLinePerTask) }
-                .collect(joining(NL + NL))
+                .joinToString(separator = NL + NL)
                 .ifEmpty { "Nothing to do right now!" }
+    }
+
+    @ShellMethod(key = ["merge-tasks"], value = "Merge some tasks together")
+    fun mergeTasks(
+            @ShellOption(help = "TASK_ID_1")
+            taskId1: String,
+            @ShellOption(help = "TASK_ID_2")
+            taskId2: String
+    ): String {
+        return try {
+            val mergedTask = taskService.mergeUserTasks(TaskId(taskId1), TaskId(taskId2))
+
+            """
+            |Tasks $taskId1 and $taskId2 successfully merged:
+            |
+            |${mergedTask.multilineRepresentation()}
+        """.trimMargin()
+        } catch (e: TaskNotFoundException) {
+            e.message!!
+        } catch (e: TasksCanNotBeMergedException) {
+            e.message!!
+        }
     }
 }
 
-private fun Task.multilineRepresentation(oneLinePerTask: Boolean): String {
-    if (oneLinePerTask) {
+private fun Task.multilineRepresentation(singleLine: Boolean = false): String {
+    if (singleLine) {
         TODO("online option isn't supported yet")
     }
     return """
-        ${id.value}
-        $summary
-        ${description ?: "No description"}
-    """.trimIndent()
+        |${id.value}
+        |$summary
+        |${description ?: "No description"}
+    """.trimMargin()
 }

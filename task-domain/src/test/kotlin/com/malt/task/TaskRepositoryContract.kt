@@ -101,6 +101,22 @@ abstract class TaskRepositoryContract {
                 .containsExactly(task3.id)
     }
 
+    @Test
+    fun `should delete a task`() {
+        // given
+        val task1 = TaskBuilder().build()
+        sut.save(task1)
+        val task2 = TaskBuilder().build()
+        sut.save(task2)
+
+        // when
+        sut.delete(task1.id)
+
+        // then
+        expectThat(sut.find(task1.id)).isNull()
+        expectThat(sut.find(task2.id)) isEqualToComparingProperties task2
+    }
+
     private fun findTasksBySpec(spec: TaskSpecification) = sut.find(spec).toList()
 
     private fun givenATaskSavedWithOwner(ownerId: TaskOwnerId): Task {

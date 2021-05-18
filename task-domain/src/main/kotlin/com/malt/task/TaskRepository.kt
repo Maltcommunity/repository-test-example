@@ -14,4 +14,6 @@ interface TaskRepository {
     // purpose.
     // See https://youtrack.jetbrains.com/issue/KT-34719 for the perspective of the Kotlin team.
     fun find(specification: TaskSpecification): Stream<Task>
+
+    fun delete(taskId: TaskId)
 }

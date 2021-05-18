@@ -1,13 +1,10 @@
 package com.malt.task
 
-import com.malt.task.test.InMemoryTaskRepository
-import com.malt.test.time.SettableClock
+import com.malt.task.test.TaskFixtures
 
-class TaskCommandsFixtures {
+class TaskCommandsFixtures : TaskFixtures() {
 
-    val clock by lazy { SettableClock() }
-    val repository by lazy { InMemoryTaskRepository() }
-    val currentUserTaskService by lazy { CurrentUserTaskService(clock, repository) }
+    val currentUserTaskService by lazy { CurrentUserTaskService(clock, taskMergeService, taskRepository) }
 
     companion object {
         val ownerIdOfCurrentUser = TaskOwnerId("owner-id-of-current-user")

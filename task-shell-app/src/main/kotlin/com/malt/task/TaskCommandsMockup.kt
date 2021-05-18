@@ -17,17 +17,4 @@ class TaskCommandsMockup {
         Description: Do something
     """.trimIndent()
 
-    @ShellMethod(key = ["merge-tasks"], value = "Merge some tasks together")
-    fun mergeTasks(
-            @ShellOption(help = "TASK_ID_1")
-            taskId1: String,
-            @ShellOption(help = "TASK_ID_2")
-            taskId2: String
-    ) = """
-        Edit the result and validate...
-        
-        Tasks merged: $taskId1, $taskId2
-        Summary: Merged summary
-        Description: Merged description
-    """
 }

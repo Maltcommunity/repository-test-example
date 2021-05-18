@@ -1,22 +1,19 @@
 package com.malt.task
 
 import com.malt.task.TaskCommandsFixtures.Companion.ownerIdOfCurrentUser
-import com.malt.task.test.TaskBuilder
 import com.malt.test.strikt.isEqualToComparingProperties
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import strikt.api.expectCatching
 import strikt.api.expectThat
-import strikt.assertions.containsExactly
-import strikt.assertions.hasSize
-import strikt.assertions.isEqualTo
-import strikt.assertions.map
+import strikt.assertions.*
 import kotlin.streams.toList
 
 internal class CurrentUserTaskServiceTest {
 
     val fixtures = TaskCommandsFixtures()
     val clock = fixtures.clock
-    val repository = fixtures.repository
+    val repository = fixtures.taskRepository
     val sut = fixtures.currentUserTaskService
 
     @Nested
@@ -67,10 +64,88 @@ internal class CurrentUserTaskServiceTest {
                     .containsExactly(taskId1, taskId3, taskId4)
         }
 
-        private fun givenExistingTaskBelongingTo(ownerId: TaskOwnerId): TaskId {
-            val task = TaskBuilder(ownerId = ownerId).build()
-            repository.save(task)
-            return task.id
+        private fun givenExistingTaskBelongingTo(ownerId: TaskOwnerId) =
+                fixtures.givenAnExistingTask(ownerId = ownerId).id
+    }
+
+    @Nested
+    inner class MergeUserTasks {
+
+        @Test
+        fun `should complain when first task can't be found`() {
+            // given
+            val taskId1 = TaskId("unknown-task-id")
+            val taskId2 = givenAnExistingTaskBelongingToCurrentUser().id
+
+            expectCatching {
+                // when
+                sut.mergeUserTasks(taskId1, taskId2)
+            }   // then
+                    .isFailure()
+                    .isA<TaskNotFoundException>()
+                    .message isEqualTo "Task not found: ${taskId1.value}"
         }
+
+        @Test
+        fun `should complain when second task can't be found`() {
+            // given
+            val taskId1 = givenAnExistingTaskBelongingToCurrentUser().id
+            val taskId2 = TaskId("unknown-task-id")
+
+            expectCatching {
+                // when
+                sut.mergeUserTasks(taskId1, taskId2)
+            }   // then
+                    .isFailure()
+                    .isA<TaskNotFoundException>()
+                    .message isEqualTo "Task not found: ${taskId2.value}"
+        }
+
+        @Test
+        fun `should complain when provided tasks are the same one`() {
+            // given
+            val taskId = givenAnExistingTaskBelongingToCurrentUser().id
+
+            expectCatching {
+                // when
+                sut.mergeUserTasks(taskId, taskId)
+            }   // then
+                    .isFailure()
+                    .isA<TasksCanNotBeMergedException>()
+                    .message isEqualTo "Can't merge task ${taskId.value} into itself"
+        }
+
+        @Test
+        fun `should complain when first task doesn't belong to current owner`() {
+            // given
+            val taskId1 = fixtures.givenAnExistingTask(ownerId = TaskOwnerId("not-current-user")).id
+            val taskId2 = givenAnExistingTaskBelongingToCurrentUser().id
+
+            expectCatching {
+                // when
+                sut.mergeUserTasks(taskId1, taskId2)
+            }   // then
+                    .isFailure()
+                    .isA<TasksCanNotBeMergedException>()
+                    .message isEqualTo "Task ${taskId1.value} doesn't belong to current user"
+        }
+
+        @Test
+        fun `should complain when second task doesn't belong to current owner`() {
+            // given
+            val taskId1 = givenAnExistingTaskBelongingToCurrentUser().id
+            val taskId2 = fixtures.givenAnExistingTask(ownerId = TaskOwnerId("not-current-user")).id
+
+            expectCatching {
+                // when
+                sut.mergeUserTasks(taskId1, taskId2)
+            }   // then
+                    .isFailure()
+                    .isA<TasksCanNotBeMergedException>()
+                    .message isEqualTo "Task ${taskId2.value} doesn't belong to current user"
+        }
+
+        fun givenAnExistingTaskBelongingToCurrentUser() =
+                fixtures.givenAnExistingTask(ownerId = ownerIdOfCurrentUser)
     }
 }

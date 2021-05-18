@@ -53,4 +53,11 @@ internal class PostgresqlTaskRepository(
                 taskMapper
         )
     }
+
+    override fun delete(taskId: TaskId) {
+        jdbcTemplate.update(
+                "DELETE FROM ${Table.name} WHERE ${Cols.id} = :id",
+                mapOf("id" to taskId.value)
+        )
+    }
 }

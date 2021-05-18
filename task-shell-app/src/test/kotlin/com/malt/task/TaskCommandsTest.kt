@@ -1,7 +1,6 @@
 package com.malt.task
 
 import com.malt.task.TaskCommandsFixtures.Companion.ownerIdOfCurrentUser
-import com.malt.task.test.TaskBuilder
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -11,7 +10,7 @@ import kotlin.streams.toList
 internal class TaskCommandsTest {
 
     val fixtures = TaskCommandsFixtures()
-    val repository = fixtures.repository
+    val repository = fixtures.taskRepository
     val sut = TaskCommands(fixtures.currentUserTaskService)
 
     @Nested
@@ -90,9 +89,9 @@ internal class TaskCommandsTest {
         @Test
         fun `should display a representation of each task owned by current user`() {
             // given
-            givenExistingTaskOfCurrentUser(1)
-            givenExistingTaskOfCurrentUser(2)
-            givenExistingTaskOfCurrentUser(3)
+            givenAnExistingTaskBelongingToCurrentUser(1)
+            givenAnExistingTaskBelongingToCurrentUser(2)
+            givenAnExistingTaskBelongingToCurrentUser(3)
 
             // when
             val resultingDisplay = sut.listTasks(oneLinePerTask = false)
@@ -116,7 +115,7 @@ internal class TaskCommandsTest {
         @Test
         fun `should display appropriate representation when a task has no description`() {
             // given
-            givenExistingTaskOfCurrentUser(id = 42, description = null)
+            givenAnExistingTaskBelongingToCurrentUser(id = 42, description = null)
 
             // when
             val resultingDisplay = sut.listTasks(oneLinePerTask = false)
@@ -128,15 +127,68 @@ internal class TaskCommandsTest {
                 No description
             """.trimIndent()
         }
+    }
 
-        private fun givenExistingTaskOfCurrentUser(id: Int, description: String? = "description of task $id") {
-            val task = TaskBuilder(
-                    id = TaskId("task-id-$id"),
-                    ownerId = ownerIdOfCurrentUser,
-                    summary = "summary of task $id",
-                    description = description
-            ).build()
-            repository.save(task)
+    @Nested
+    inner class MergeTasksCommand {
+
+        @Test
+        fun `should display an error in case one of the provided tasks can't be found`() {
+            // given
+            val taskId1 = TaskId("unknown-task-id")
+            val taskId2 = fixtures.givenAnExistingTask(ownerId = ownerIdOfCurrentUser).id
+
+            // when
+            val resultingDisplay = sut.mergeTasks(taskId1.value, taskId2.value)
+
+            // then
+            expectThat(resultingDisplay) isEqualTo "Task not found: ${taskId1.value}"
+        }
+
+        @Test
+        fun `should display an error in case an error prevents merging tasks`() {
+            // given
+            val taskId1 = fixtures.givenAnExistingTask(ownerId = ownerIdOfCurrentUser).id
+            val taskId2 = fixtures.givenAnExistingTask(ownerId = TaskOwnerId("not-current-user")).id
+
+            // when
+            val resultingDisplay = sut.mergeTasks(taskId1.value, taskId2.value)
+
+            // then
+            expectThat(resultingDisplay) isEqualTo "Task ${taskId2.value} doesn't belong to current user"
+        }
+
+        @Test
+        fun `should display merged task`() {
+            // given
+            val taskId1 = givenAnExistingTaskBelongingToCurrentUser(1).id
+            val taskId2 = givenAnExistingTaskBelongingToCurrentUser(2).id
+
+            // when
+            val resultingDisplay = sut.mergeTasks(taskId1.value, taskId2.value)
+
+            // then
+            expectThat(resultingDisplay) isEqualTo """
+                Tasks task-id-1 and task-id-2 successfully merged:
+                
+                task-id-2
+                summary of task 2 - summary of task 1
+                description of task 2
+                
+                description of task 1
+            """.trimIndent()
         }
     }
+
+    private fun givenAnExistingTaskBelongingToCurrentUser(
+            id: Int,
+            summary: String = "summary of task $id",
+            description: String? = "description of task $id"
+    ) = fixtures.givenAnExistingTask(
+            id = TaskId("task-id-$id"),
+            ownerId = ownerIdOfCurrentUser,
+            summary = summary,
+            description = description
+    )
 }
+
