@@ -49,6 +49,25 @@ internal class TaskCommandsTest {
                     "Task summary can't be blank."
         }
 
+        @Test
+        fun `should return appropriate representation when task has no description`() {
+            // given
+            val taskSummary = "Some task"
+            val taskDescription = null
+
+            // when
+            val resultingDisplay = sut.addTask(summary = taskSummary, description = taskDescription)
+
+            // then
+            val createdTask = findFirstTaskOfUser()
+
+            expectThat(resultingDisplay) isEqualTo """
+                Task ${createdTask.id.value} created with:
+                Summary: $taskSummary
+                No description
+            """.trimIndent()
+        }
+
         private fun findFirstTaskOfUser() =
                 repository.find(TaskOwnerIdIs(ownerIdOfCurrentUser)).toList().first()
     }
@@ -94,12 +113,28 @@ internal class TaskCommandsTest {
             """.trimIndent()
         }
 
-        private fun givenExistingTaskOfCurrentUser(id: Int) {
+        @Test
+        fun `should display appropriate representation when a task has no description`() {
+            // given
+            givenExistingTaskOfCurrentUser(id = 42, description = null)
+
+            // when
+            val resultingDisplay = sut.listTasks(oneLinePerTask = false)
+
+            // then
+            expectThat(resultingDisplay) isEqualTo """
+                task-id-42
+                summary of task 42
+                No description
+            """.trimIndent()
+        }
+
+        private fun givenExistingTaskOfCurrentUser(id: Int, description: String? = "description of task $id") {
             val task = TaskBuilder(
                     id = TaskId("task-id-$id"),
                     ownerId = ownerIdOfCurrentUser,
                     summary = "summary of task $id",
-                    description = "description of task $id"
+                    description = description
             ).build()
             repository.save(task)
         }

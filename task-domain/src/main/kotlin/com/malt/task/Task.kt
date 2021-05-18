@@ -36,7 +36,7 @@ class Task(
         val creationDate: OffsetDateTime = OffsetDateTime.now(),
         val ownerId: TaskOwnerId,
         val summary: String,
-        val description: String
+        val description: String?
 ) {
 
     constructor(
@@ -44,7 +44,7 @@ class Task(
             clock: Clock,
             ownerId: TaskOwnerId,
             summary: String,
-            description: String
+            description: String?
     ) : this(
             id = id,
             creationDate = OffsetDateTime.now(clock),
@@ -63,7 +63,7 @@ class Task(
 
     fun withSummary(newSummary: String) = copy(summary = newSummary)
 
-    fun withDescription(newDescription: String) = copy(description = newDescription)
+    fun withDescription(newDescription: String?) = copy(description = newDescription)
 
     /**
      * A copy method similar to that of a data class, to help other methods return a slightly

@@ -44,6 +44,21 @@ abstract class TaskRepositoryContract {
     }
 
     @Test
+    fun `should save a task having a minimum of details`() {
+        // given
+        val unsavedTask = TaskBuilder(
+                summary = "A",
+                description = null
+        ).build()
+
+        // when
+        sut.save(unsavedTask)
+
+        // then
+        assertThat(sut.find(unsavedTask.id)).usingRecursiveComparison().isEqualTo(unsavedTask)
+    }
+
+    @Test
     fun `should update an existing task`() {
         // given
         val initialTask = TaskBuilder().build()

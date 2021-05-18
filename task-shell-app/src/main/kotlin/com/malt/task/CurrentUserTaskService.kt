@@ -12,7 +12,7 @@ class CurrentUserTaskService(
 ) {
 
     @Transactional
-    fun addTaskForUser(summary: String, description: String): Task {
+    fun addTaskForUser(summary: String, description: String?): Task {
         val newTask = Task(
                 clock = clock,
                 ownerId = CurrentTaskOwnerIdHolder.currentTaskOwnerId,

@@ -17,18 +17,18 @@ class TaskCommands(
     @ShellMethod(key = ["add-task"], value = "Add a new task")
     fun addTask(
             summary: String,
-            description: String
+            description: String?
     ): String {
-        if (!isAValidTaskSummary(summary)) {
+        if (!isAValidTaskSummary(summary.trim())) {
             return "Sorry, the provided summary is invalid. Task summary can't be blank."
         }
 
-        val newTask = taskService.addTaskForUser(summary, description)
+        val newTask = taskService.addTaskForUser(summary.trim(), description?.trim())
 
         return """
             Task ${newTask.id.value} created with:
             Summary: ${newTask.summary}
-            Description: ${newTask.description}
+            ${if (newTask.description != null) "Description: ${newTask.description}" else "No description"}
         """.trimIndent()
     }
 
@@ -52,6 +52,6 @@ private fun Task.multilineRepresentation(oneLinePerTask: Boolean): String {
     return """
         ${id.value}
         $summary
-        $description
+        ${description ?: "No description"}
     """.trimIndent()
 }
