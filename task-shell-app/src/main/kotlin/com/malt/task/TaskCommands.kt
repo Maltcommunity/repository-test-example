@@ -34,10 +34,15 @@ class TaskCommands(
             @ShellOption(value = ["oneline"], help = "Display each task on a single line")
             oneLinePerTask: Boolean
     ): String? {
-        return taskService.findAllUserTasks()
-                .map { it.multilineRepresentation(oneLinePerTask) }
-                .joinToString(separator = NL + NL)
-                .ifEmpty { "Nothing to do right now!" }
+        val userTasks = taskService.findAllUserTasks()
+        return if (userTasks.isEmpty()) {
+            "Nothing to do right now!"
+        } else {
+            val taskHeaderLine = "--------------------$NL"
+            userTasks.joinToString(separator = "$NL$NL$taskHeaderLine", prefix = taskHeaderLine) {
+                it.multilineRepresentation(oneLinePerTask)
+            }
+        }
     }
 
     @ShellMethod(key = ["merge-tasks"], value = "Merge some tasks together")

@@ -98,14 +98,17 @@ internal class TaskCommandsTest {
 
             // then
             expectThat(resultingDisplay) isEqualTo """
+                --------------------
                 task-id-1
                 summary of task 1
                 description of task 1
                 
+                --------------------
                 task-id-2
                 summary of task 2
                 description of task 2
                 
+                --------------------
                 task-id-3
                 summary of task 3
                 description of task 3
@@ -122,6 +125,7 @@ internal class TaskCommandsTest {
 
             // then
             expectThat(resultingDisplay) isEqualTo """
+                --------------------
                 task-id-42
                 summary of task 42
                 No description
@@ -191,4 +195,3 @@ internal class TaskCommandsTest {
             description = description
     )
 }
-
