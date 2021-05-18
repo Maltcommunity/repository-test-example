@@ -36,6 +36,19 @@ internal class TaskCommandsTest {
             """.trimIndent()
         }
 
+        @Test
+        fun `should display an error in case task is invalid`() {
+            // given
+            val invalidTaskSummary = "  "
+
+            // when
+            val resultingDisplay = sut.addTask(summary = invalidTaskSummary, description = "irrelevant")
+
+            // then
+            expectThat(resultingDisplay) isEqualTo "Sorry, the provided summary is invalid. " +
+                    "Task summary can't be blank."
+        }
+
         private fun findFirstTaskOfUser() =
                 repository.find(TaskOwnerIdIs(ownerIdOfCurrentUser)).toList().first()
     }

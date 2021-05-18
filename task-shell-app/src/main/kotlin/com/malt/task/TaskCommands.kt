@@ -19,6 +19,10 @@ class TaskCommands(
             summary: String,
             description: String
     ): String {
+        if (!isAValidTaskSummary(summary)) {
+            return "Sorry, the provided summary is invalid. Task summary can't be blank."
+        }
+
         val newTask = taskService.addTaskForUser(summary, description)
 
         return """

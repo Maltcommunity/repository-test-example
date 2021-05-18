@@ -53,6 +53,14 @@ class Task(
             description = description
     )
 
+    init {
+        validateSummary(summary)
+    }
+
+    private fun validateSummary(summary: String) {
+        require(isAValidTaskSummary(summary)) { "Task summary can't be blank" }
+    }
+
     fun withSummary(newSummary: String) = copy(summary = newSummary)
 
     fun withDescription(newDescription: String) = copy(description = newDescription)
@@ -81,3 +89,5 @@ data class TaskId(val value: String) {
         fun generate() = TaskId(UUID.randomUUID().toString())
     }
 }
+
+fun isAValidTaskSummary(summary: String) = summary.isNotBlank()
