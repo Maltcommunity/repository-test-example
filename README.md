@@ -15,10 +15,13 @@ A shell application is built to allow users to manage their tasks.
   [TaskRepositoryContract](task-domain/src/test/kotlin/com/malt/task/TaskRepositoryContract.kt)
 * A (so-called) "Fake" in-memory implementation of the repository contract:
   [InMemoryTaskRepository](task-domain/src/test/kotlin/com/malt/task/test/InMemoryTaskRepository.kt)
-  (and its tests: [InMemoryTaskRepositoryTest](task-domain/src/test/kotlin/com/malt/task/test/InMemoryTaskRepositoryTest.kt)).
+  (and its tests: [InMemoryTaskRepositoryTest](task-domain/src/test/kotlin/com/malt/task/test/InMemoryTaskRepositoryTest.kt)).  
+  (Note: a Fake may expose more operations than the contract, for instance here: a `clear` method.)
 * An implementation of the repository contract using PostgreSQL:
   [PostgresqlTaskRepository](adapters/task-persistence/src/main/kotlin/com/malt/task/PostgresqlTaskRepository.kt)
   (and its tests: [PostgresqlTaskRepositoryTest](adapters/task-persistence/src/test/kotlin/com/malt/task/PostgresqlTaskRepositoryTest.kt))
+* A way to easily use [Testcontainers](https://www.testcontainers.org/) with Spring:
+  [PostgresqlTest](common/test-utils/src/main/java/com/malt/test/postgres/PostgresqlTest.java)
 * The contract tests guarantee that the in-memory repository is as much a valid implementation of
   the repository as the PostgreSQl one. Those two implementations are interchangeable.
 * Fixtures for easily writing unit tests using of the in-memory implementation of the contract:
