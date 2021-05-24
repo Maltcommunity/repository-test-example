@@ -20,7 +20,7 @@ internal class CurrentUserTaskServiceTest {
     inner class AddTaskForUser {
 
         @Test
-        fun `should save a task and return a representation of it`() {
+        fun `should save task and return it when adding a new task`() {
             // given
             val taskSummary = "Some task"
             val taskDescription = "the aim of it being to do something"

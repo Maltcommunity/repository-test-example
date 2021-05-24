@@ -163,7 +163,7 @@ internal class TaskCommandsTest {
         }
 
         @Test
-        fun `should display merged task`() {
+        fun `should display task resulting from merging two other ones`() {
             // given
             val taskId1 = givenAnExistingTaskBelongingToCurrentUser(1).id
             val taskId2 = givenAnExistingTaskBelongingToCurrentUser(2).id
