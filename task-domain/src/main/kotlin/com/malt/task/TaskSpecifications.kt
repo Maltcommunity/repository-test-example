@@ -56,3 +56,8 @@ data class TaskOwnerIdIs(val ownerId: TaskOwnerId) : TaskSpecification {
 
     override fun isSatisfiedBy(task: Task) = task.ownerId == ownerId
 }
+
+// other possible specifications:
+// - TaskCreatedAfter(val date: OffsetDateTime)
+// - TaskOverdue(val now: OffsetDateTime)  (if we give Task a dueDate)
+// - ...

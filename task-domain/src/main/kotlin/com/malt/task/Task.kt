@@ -37,6 +37,10 @@ class Task(
         val ownerId: TaskOwnerId,
         val summary: String,
         val description: String?
+
+        // we may easily imagine adding:
+        // - a `status`: TO_DO or DONE
+        // - a `dueDate` and logic related to overdue tasks
 ) {
 
     constructor(

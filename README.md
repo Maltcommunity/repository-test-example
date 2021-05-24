@@ -7,6 +7,10 @@ repositories that access a database.
 
 A shell application is built to allow users to manage their tasks.
 
+A task is a very simple concept here: it's composed of a summary and a description, and it belongs
+to an owner. This is enough for our demonstration, and it already allows for imagining several
+realistic use cases.
+
 ## Points of interest
 
 * A repository interface speaking the language of the domain (i.e. a compile-time contract):
@@ -34,6 +38,20 @@ A shell application is built to allow users to manage their tasks.
   [CurrentUserTaskServiceTest](task-shell-app/src/test/kotlin/com/malt/task/CurrentUserTaskServiceTest.kt)
   or [TaskCommandsTest](task-shell-app/src/test/kotlin/com/malt/task/TaskCommandsTest.kt)
   for examples of unit tests making use of it, both in the domain module and in the app module.
+
+While not related to our main demonstration, the code also features:
+
+* The use of [Liquibase](https://www.liquibase.org/) to evolve our DB schema. See
+  [db.changelog-master.yaml](task-shell-app/src/main/resources/db/changelog/db.changelog-master.yaml),
+  [task-00002-create-task-table.sql](adapters/task-persistence/src/main/resources/db/changelog/task/task-00002-create-task-table.sql),
+  etc.
+* An example of the [Specification pattern](https://en.wikipedia.org/wiki/Specification_pattern):
+  [TaskSpecifications](task-domain/src/main/kotlin/com/malt/task/TaskSpecifications.kt) and a way
+  to [map such specifications to SQL queries](adapters/task-persistence/src/main/kotlin/com/malt/task/SqlSelection.kt).
+* The extraction of common test fixtures in a single place to make tests more maintainable:
+  [TaskFixtures](task-domain/src/test/kotlin/com/malt/task/test/TaskFixtures.kt) and
+  [TaskCommandsFixtures](task-shell-app/src/test/kotlin/com/malt/task/TaskCommandsFixtures.kt)
+* A builder to easily create test tasks: [TaskBuilder](task-domain/src/test/kotlin/com/malt/task/test/TaskBuilder.kt)
 
 ## Why a shell application?
 
