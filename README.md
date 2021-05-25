@@ -1,7 +1,8 @@
 # repository-test-example
 
-A sample codebase demonstrating how to write efficient and flexible automated tests when using
-repositories that access a database.
+A sample codebase accompanying the following article:
+[A guide to safely and efficiently test code that uses repositories](https://medium.com/nerds-malt/a-guide-to-safely-and-efficiently-test-code-that-uses-repositories-c91effb41dd0).
+
 
 ## What does the code do?
 
